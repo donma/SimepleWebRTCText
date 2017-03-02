@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>WebRTC Demo</title>
+    <meta charset="utf-8" />
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+</head>
+<body>
+    <p>
+        <input id="btnLoginPerson1" type="button" value="LOGIN PERSON1" />
+
+        <input id="btnCallPerson2" type="button" value="Call PSERSON2" />
+
+        <input id="btnLogout" type="button" value="登出" />
+    </p>
+    <p>
+        <input id="btnLoginPerson2" type="button" value="LOGIN PERSON2" />
+    </p>
+
+    <p>
+        <input id="btnSend" type="button" value="發送訊息" />
+        <input id="txtContent" type="text" />
+
+    </p>
+
+    <div id="spanLog">
+
+    </div>
+
+    <script src="client.js"></script>
+
+
+
+
+    <script>
+
+        //Control Event
+
+        // Person 1 Login
+        $('#btnLoginPerson1').click(function () {
+            name = 'PERSON1';
+            send({
+                type: "login",
+                name: name
+            });
+        });
+
+        //Person Logout
+        $('#btnLogout').click(function () {
+            send({
+                type: "leave",
+                name: name
+            });
+
+        });
+
+        // Person 2 Login
+        $('#btnLoginPerson2').click(function () {
+            name = 'PERSON2';
+            send({
+                type: "login",
+                name: name
+            });
+        });
+
+
+
+        //Call Person2
+        $('#btnCallPerson2').click(function () {
+            var callToUsername = 'PERSON2';
+
+            if (callToUsername.length > 0) {
+                connectedUser = callToUsername;
+                // 提出申請
+                yourConn.createOffer(function (offer) {
+                    send({
+                        type: "offer",
+                        offer: offer
+                    });
+                    yourConn.setLocalDescription(offer);
+                }, function (error) {
+                    alert("Error when creating an offer");
+                });
+            }
+
+        });
+
+
+        //送出訊息
+        $('#btnSend').click(function () {
+            if ($('#txtContent').val().length > 0) {
+
+                dataChannel.send($('#txtContent').val());
+                AddLog('[' + name + ' 送出]' + $('#txtContent').val(), 'b');
+            } else {
+                AddLog('你沒有輸入', 'r');
+            }
+
+        });
+
+
+
+        // Unload to Leave
+        $(window).unload(function () {
+            send({
+                type: "leave",
+                name: name
+            });
+            handleLeave();
+        });
+
+
+
+        //Log Util
+        function AddLog(text, color) {
+            if (color.indexOf('r') > -1) {
+                $('#spanLog').append("<span style='color:red'>" + text + "</span><br />");
+            }
+            else if (color.indexOf('y') > -1) {
+                $('#spanLog').append("<span style='color:brown'>" + text + "</span><br />");
+            }
+            else if (color.indexOf('b') > -1) {
+                $('#spanLog').append("<span style='color:blue'>" + text + "</span><br />");
+            } else {
+                $('#spanLog').append("<span>" + text + "</span><br />");
+            }
+        }
+
+
+    </script>
+</body>
+</html>
